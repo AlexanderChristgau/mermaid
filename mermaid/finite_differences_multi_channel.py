@@ -550,7 +550,4 @@ class FD_torch_multi_channel(FD_multi_channel):
         :param A: input array
         :return: shape/size
         """
-        if type(A.size) == int:
-            print("John")
-            pass
         return A.size()
