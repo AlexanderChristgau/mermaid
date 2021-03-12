@@ -54,6 +54,9 @@ class AvailableModels(object):
             'svf_quasi_momentum_image': (RN.SVFQuasiMomentumImageNet,
                                          RN.SVFQuasiMomentumImageLoss, False,
                                          'EXPERIMENTAL: Image-based SVF version which estimates velcocity based on a smoothed vetor field'),
+            'lddmm_stochastic_image': (RN.LDDMMShootingVectorMomentumImageNetStochastic,
+                                     RN.LDDMMShootingVectorMomentumImageLoss, False,
+                                     'image-based shooting-based LDDMM using the vector momentum'),
 
             'lddmm_adapt_smoother_map': (RN.LDDMMAdaptiveSmootherMomentumMapNet,RN.LDDMMAdaptiveSmootherMomentumMapLoss,True,"map-based shooting-based Region specific diffemorphic mapping, with a spatio-temporal regularizer"),
             'svf_adapt_smoother_map': (RN.SVFVectorAdaptiveSmootherMomentumMapNet,RN.SVFVectorAdaptiveSmootherMomentumMapLoss,True,"map-based shooting-based vSVF, with a spatio regularizer"),

@@ -2,8 +2,8 @@
     "model": {
         "deformation": {
             "compute_similarity_measure_at_low_res": false,
-            "map_low_res_factor": null,
-            "use_map": true
+            "map_low_res_factor": 1.0,
+            "use_map": false
         },
         "registration_model": {
             "env": {
@@ -34,28 +34,30 @@
                     ],
                     "type": "multiGaussian"
                 },
-                "solver": "rk4"
+                "solver": "rk4",
+                "tFrom": 0.0,
+                "tTo": 1.0
             },
-            "loss": {
-                "display_max_displacement": false,
-                "limit_displacement": false,
-                "max_displacement": 0.05
+            "forward_modelF": {
+                "tTo": 1.0
+            },
+            "shooting_vector_momentum": {
+                "use_velocity_mask_on_boundary": false
             },
             "similarity_measure": {
-                "develop_mod_on": false,
                 "sigma": 0.1,
-                "type": "ncc"
+                "type": "ssd"
             },
             "spline_order": 1,
-            "type": "svf_scalar_momentum_map",
+            "type": "lddmm_shooting_image",
             "use_CFL_clamping": true
         }
     },
     "optimizer": {
         "gradient_clipping": {
-            "clip_display": false,
-            "clip_individual_gradient": true,
-            "clip_individual_gradient_value": 1.0,
+            "clip_display": true,
+            "clip_individual_gradient": false,
+            "clip_individual_gradient_value": 1.0158730158730158,
             "clip_shared_gradient": true,
             "clip_shared_gradient_value": 1.0
         },
@@ -82,7 +84,7 @@
             }
         },
         "single_scale": {
-            "nr_of_iterations": 100,
+            "nr_of_iterations": 10,
             "rel_ftol": 1e-07
         },
         "use_step_size_scheduler": true,

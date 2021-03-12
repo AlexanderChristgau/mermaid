@@ -54,7 +54,7 @@ import mermaid.multiscale_optimizer as MO
 # - ``model_name``: Simply the name of the desired registration model. For example, ``lddmm_shooting`` is an LDDMM implementation which optimizes over the initial vector momentum and operates either on maps or directly on the image (depening on ``use_map``).
 # - ``map_low_res_factor``: Especially when computing in 3D memory sometimes becomes an issue. Hence, for map-based solutions mermaid supports computing solutions of the evolution equations at a lower resolution. ``map_low_res_factor`` specifies how low this resoultion should be. ``None`` or ``1.0`` is the original resolution. ``0.5``, for example, uses half the resolution in each direction. In any case, the similarity measure is always evaluated at the original resolution via upsampling of the map.
 
-use_map = True
+use_map = False
 model_name = 'lddmm_shooting'
 map_low_res_factor = 0.5
 

@@ -83,7 +83,8 @@ class ODEWrapBlock(nn.Module):
     """
     A warp on ODE method, providing interface for embedded rungekutta sovler and for torchdiffeq solver
     """
-    def __init__(self, model, cparams=None, use_odeint=True,use_ode_tuple=False,tFrom=0., tTo=1.):
+    def __init__(self, model, cparams=None, use_odeint=True,use_ode_tuple=False,
+                 tFrom=0., tTo=1., use_sdeint=False):
         """
 
         :param model: the ode/pde model to be solved
@@ -98,6 +99,8 @@ class ODEWrapBlock(nn.Module):
         """ the ode/pde model to be solved"""
         self.cparams = cparams
         """ParameterDict, the model settings"""
+        self.use_sdeint=use_sdeint
+        """if true use embedded sde integrator"""
         self.use_odeint=use_odeint
         """if true, use torchdiffeq, else, use embedded rungekutta (rk4)"""
         self.use_ode_tuple=use_ode_tuple
@@ -115,7 +118,10 @@ class ODEWrapBlock(nn.Module):
         return self.dt
 
     def init_solver(self,pars_to_pass_i,variables_from_optimizer,has_combined_input=False):
-        if self.use_odeint:
+        if self.use_sdeint:
+            self.integrator = RK.Milstein(self.model.f, self.model.g, pars_to_pass_i, self.cparams)
+            self.integrator.set_pars(pars_to_pass_i)
+        elif self.use_odeint:
             self.integrator = ODEBlock(self.cparams)
             wraped_func = FMW.ODEWrapFunc_tuple if self.use_ode_tuple else FMW.ODEWrapFunc
             func = wraped_func(self.model, has_combined_input=has_combined_input, pars=pars_to_pass_i,
@@ -148,7 +154,7 @@ class ODEWrapBlock(nn.Module):
         return self.integrator.solve(input_list, self.tFrom, self.tTo, variables_from_optimizer)
 
     def solve(self,input_list,  variables_from_optimizer):
-        if self.use_odeint:
+        if self.use_odeint and not self.use_sdeint:
             return self.solve_odeint(input_list)
         else:
             return self.solve_embedded_ode(input_list, variables_from_optimizer)

@@ -137,8 +137,6 @@ def compute_jacobi(phi,spacing):
 
 
 
-
-
 def get_input(img_pair,weight_pair=None):
     s_path, t_path = img_pair
     moving = torch.load(s_path)

@@ -291,7 +291,6 @@ class RHSLibrary(object):
         return rhsm
 
 
-
     def rhs_adapt_epdiff_wkw_multiNC(self, m, v,w, sm_wm,smoother):
         '''
         Computes the right hand side of the EPDiff equation for of N momenta (for N images).
@@ -523,6 +522,59 @@ class EPDiffImage(ForwardModel):
         I = x[1]
         v = self.smoother.smooth(m,None,utils.combine_dict(pars,{'I': I}),variables_from_optimizer)
         # print('max(|v|) = ' + str( v.abs().max() ))
+        return [self.rhs.rhs_epdiff_multiNC(m,v), self.rhs.rhs_advect_image_multiNC(I,v)]
+
+
+class EPDiffImageStochastic(ForwardModel):
+    """
+    Forward model for the stochastic EPdiff equation. State is the momentum, m, and the image I:
+    :math:`d(m_1,...,m_d)^T =
+    -(div(m_1v),...,div(m_d v))^T dt-(Dv)^Tm dt
+    -((div(m_1 \\sigma),...,div(m_d \\sigma))^T  +(D\\sigma)^T m) \\circ dW`
+
+    :math:`v=Km`
+
+    :math:`I_t+\\nabla I^T v=0`
+    """
+
+    def __init__(self, sz, spacing, smoother, params=None):
+        super(EPDiffImageStochastic, self).__init__(sz, spacing, params)
+        self.smoother = smoother
+
+    def g(self,t, x, pars, variables_from_optimizer=None):
+        """
+        Noise / Volatility term
+
+        :param pars: assumes an n-D velocity field is passed as the only input argument
+        :param variables_from_optimizer: variables that can be passed from the optimizer
+        :return: Returns noise added to velocity field
+        """
+        n_sigma = pars["n_sigma"]
+        sigma = pars["noise_field"]
+        m = (x[0]).expand(n_sigma, -1,-1,-1)
+        I = (x[1]).expand(n_sigma, -1,-1,-1)
+
+        return [self.rhs.rhs_epdiff_multiNC(m,sigma), self.rhs.rhs_advect_image_multiNC(I,sigma)]
+
+    def f(self, t, x, pars=None, variables_from_optimizer=None):
+        """
+        Function to be integrated, i.e., right hand side of the EPDiff equation:
+        :math:`-(div(m_1v),...,div(m_dv))^T-(Dv)^Tm`
+
+        :math:`-\\nabla I^Tv`
+
+        :param t: time (ignored; not time-dependent)
+        :param x: state, here the vector momentum, m, and the image, I
+        :param pars: ignored (does not expect any additional inputs)
+        :param variables_from_optimizer: variables that can be passed from the optimizer
+        :return: right hand side [m,I]
+        """
+
+        # assume x[0] is m and x[1] is I for the state
+        m = x[0]
+        I = x[1]
+        v = self.smoother.smooth(m, None, utils.combine_dict(pars, {'I': I}), variables_from_optimizer)
+
         return [self.rhs.rhs_epdiff_multiNC(m,v), self.rhs.rhs_advect_image_multiNC(I,v)]
 
 
