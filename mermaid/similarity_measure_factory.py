@@ -296,6 +296,7 @@ class NCCSimilarity(SimilarityMeasure):
         I1mean = I1.mean(dim=2, keepdim=True)
         I0_m_mean = I0-I0mean
         I1_m_mean = I1-I1mean
+        I1_m_mean = I1-I1mean
         nccSqr = (((I0_m_mean)*(I1_m_mean)).mean(dim=2)**2)/\
                  (((I0_m_mean)**2).mean(dim=2)*((I1_m_mean)**2).mean(dim=2))
         nccSqr =nccSqr.mean(dim=1).sum()

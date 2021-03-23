@@ -3,7 +3,7 @@
         "deformation": {
             "compute_similarity_measure_at_low_res": false,
             "map_low_res_factor": 1.0,
-            "use_map": false
+            "use_map": true
         },
         "registration_model": {
             "env": {
@@ -41,6 +41,11 @@
             "forward_modelF": {
                 "tTo": 1.0
             },
+            "loss": {
+                "display_max_displacement": false,
+                "limit_displacement": false,
+                "max_displacement": 0.05
+            },
             "shooting_vector_momentum": {
                 "use_velocity_mask_on_boundary": false
             },
@@ -49,11 +54,20 @@
                 "type": "ssd"
             },
             "spline_order": 1,
-            "type": "lddmm_shooting_image",
+            "type": "lddmm_shooting_map",
             "use_CFL_clamping": true
         }
     },
     "optimizer": {
+        "adam": {
+            "betas": [
+                0.9,
+                0.999
+            ],
+            "eps": 1e-07,
+            "lr": 0.05,
+            "weight_decay": 0.0
+        },
         "gradient_clipping": {
             "clip_display": true,
             "clip_individual_gradient": false,
@@ -61,30 +75,14 @@
             "clip_shared_gradient": true,
             "clip_shared_gradient_value": 1.0
         },
-        "name": "sgd",
+        "name": "adam",
         "scheduler": {
             "factor": 0.5,
             "patience": 10,
             "verbose": true
         },
-        "sgd": {
-            "individual": {
-                "dampening": 0.0,
-                "lr": 0.1,
-                "momentum": 0.9,
-                "nesterov": true,
-                "weight_decay": 0.0
-            },
-            "shared": {
-                "dampening": 0.0,
-                "lr": 0.1,
-                "momentum": 0.9,
-                "nesterov": true,
-                "weight_decay": 0.0
-            }
-        },
         "single_scale": {
-            "nr_of_iterations": 10,
+            "nr_of_iterations": 20,
             "rel_ftol": 1e-07
         },
         "use_step_size_scheduler": true,

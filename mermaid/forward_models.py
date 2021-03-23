@@ -178,7 +178,6 @@ class RHSLibrary(object):
         :return: Returns the RHS of the advection equations involved BxCxXxYxZ
         '''
 
-        sz = phi.size()
         rhs_ret = self._rhs_advect_map_call(phi, v)
         return rhs_ret
 
@@ -636,8 +635,6 @@ class EPDiffMap(ForwardModel):
             v = self.smoother.smooth(m,None,utils.combine_dict(pars,{'phi':phi}),variables_from_optimizer)
         else:
             v = self.smoother.adaptive_smooth(m, phi, using_map=True)
-
-        # print('max(|v|) = ' + str( v.abs().max() ))
 
         if self.compute_inverse_map:
             ret_val= [self.rhs.rhs_epdiff_multiNC(m,v),

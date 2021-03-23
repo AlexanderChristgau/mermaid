@@ -103,12 +103,12 @@ si.print_available_models()
 # all the parameter settings. If ``params`` is not specified default settings will be used. By running for one
 # iteration for example, this allows writing out a fresh settings template which can then be edited.
 
-si.register_images(I0, I1, spacing, model_name='lddmm_shooting_image',
-                   nr_of_iterations=10,
+si.register_images(I0, I1, spacing, model_name='lddmm_shooting_map',
+                   nr_of_iterations=20,
                    use_multi_scale=False,
                    visualize_step=5,
-                   optimizer_name='sgd',
-                   learning_rate=0.1,
+                   optimizer_name='adam',
+                   learning_rate=0.05,
                    rel_ftol=1e-7,
                    json_config_out_filename=('test2d_tst.json',
                                              'test2d_tst_with_comments.json'),

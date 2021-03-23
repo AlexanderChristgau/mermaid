@@ -3,6 +3,7 @@ Package to create example images to test the image registration algorithms
 """
 from __future__ import absolute_import
 
+import os
 from builtins import object
 from abc import ABCMeta, abstractmethod
 import numpy as np
@@ -96,6 +97,7 @@ class CreateRealExampleImages(CreateExample):
     def __init__(self,dim=2,s_path=None,t_path=None):
         super(CreateRealExampleImages, self).__init__(dim)
         if s_path is None:
+            print(os.getcwd())
             self.s_path = '//mermaid/mermaid_test_data/brain_slices/ws_slice.nrrd'
             self.t_path = '//mermaid/mermaid_test_data/brain_slices/wt_slice.nrrd'
         else:
