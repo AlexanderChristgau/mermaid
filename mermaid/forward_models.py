@@ -576,6 +576,48 @@ class EPDiffImageStochastic(ForwardModel):
 
         return [self.rhs.rhs_epdiff_multiNC(m,v), self.rhs.rhs_advect_image_multiNC(I,v)]
 
+class MomentODE(ForwardModel):
+    '''
+    Forward model for first order momentum equations of stochastic EPDiff.
+    '''
+    def __init__(self, sz, spacing, smoother, sigma, params=None):
+        super(MomentODE, self).__init__(sz, spacing, params)
+        self.smoother = smoother
+        self.sigma = sigma
+        self.n_sigma = (sigma.shape)[0]
+
+    def f(self, t, x, u, pars=None, variables_from_optimizer=None):
+        """
+        Function to be integrated, i.e., right hand side of the EPDiff equation:
+        :math:`-(div(m_1v),...,div(m_dv))^T-(Dv)^Tm + Itô correction term`
+        :math:`-\\nabla I^Tv + Itô correction term`
+
+        :param t: time (ignored; not time-dependent)
+        :param x: state, here the vector momentum, m, and the image, I
+        :param u: ignored, no external input
+        :param pars: ignored (does not expect any additional inputs)
+        :param variables_from_optimizer: variables that can be passed from the optimizer
+        :return: right hand side [m,I]
+        """
+
+        # assume x[0] is m and x[1] is I for the state
+        m = x[0]
+        I = x[1]
+        v = self.smoother.smooth(m, None, utils.combine_dict(pars, {'I': I}), variables_from_optimizer)
+
+        m_exp = m.expand(self.n_sigma, -1,-1,-1)
+        I_exp = I.expand(self.n_sigma, -1,-1,-1)
+
+        noise0 = torch.sum(self.rhs.rhs_epdiff_multiNC(
+            self.rhs.rhs_epdiff_multiNC(m_exp,self.sigma),self.sigma),
+            axis=0, keepdim=True)
+        noise1 = torch.sum(self.rhs.rhs_advect_image_multiNC(
+            self.rhs.rhs_advect_image_multiNC(I_exp,self.sigma),self.sigma),
+            axis=0, keepdim=True)
+
+        return [self.rhs.rhs_epdiff_multiNC(m, v)+0.5*noise0,
+                self.rhs.rhs_advect_image_multiNC(I, v) + 0.5*noise1]
+
 
 class EPDiffMap(ForwardModel):
     """
@@ -645,8 +687,6 @@ class EPDiffMap(ForwardModel):
             new_phi = self.rhs.rhs_advect_map_multiNC(phi,v)
             ret_val= [new_m, new_phi]
         return ret_val
-
-
 
 class EPDiffAdaptMap(ForwardModel):
     """
