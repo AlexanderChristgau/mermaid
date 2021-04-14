@@ -580,7 +580,7 @@ class MomentODE(ForwardModel):
     '''
     Forward model for first order momentum equations of stochastic EPDiff.
     '''
-    def __init__(self, sz, spacing, smoother, sigma, params=None):
+    def __init__(self, sz, spacing, smoother,sigma,params=None):
         super(MomentODE, self).__init__(sz, spacing, params)
         self.smoother = smoother
         self.sigma = sigma

@@ -499,6 +499,37 @@ class MultiEulerMaruyama(MultiSDEIntegrator):
         return xp1
 
 
+class MultiEulerHeun(MultiSDEIntegrator):
+    """
+    Euler Heun scheme for forward integration of:
+    x(t + dt) = x(t) + f(x(t))dt + g_a(x(t))dW_t^a
+    """
+
+    def solve_one_step(self, x, t, dt, dW, vo=None):
+        """
+        One step for Euler-forward
+
+        :param x: state at time t
+        :param t: initial time
+        :param dt: time increment
+        :param vo: variables from optimizer
+        :return: state at x+dt
+        """
+        # Compute Euler-Maryuama step as supporting value
+        f_val = self.f(t, x, self.pars, vo)
+        g_val = self.g(t,x,self.pars,vo)
+        noise1 = self._sumBtdW(g_val, dW)
+        x_bar = self._xpytspz(x,f_val,dt,noise1)
+
+        # Take midpoints of current and supporting values
+        f_bar = self.f(t, x_bar, self.pars, vo)
+        g_bar = self.g(t,x_bar,self.pars,vo)
+        noise_bar = self._xpyts(self._sumBtdW(g_bar, 0.5*dW),noise1,0.5)
+        xp1 = self._xpytspz(x,self._xpy(f_val,f_bar),0.5*dt,noise_bar)
+        return xp1
+
+
+
 class Milstein(MultiSDEIntegrator):
     """
     Derivative free Milstein forward integration of:

@@ -119,7 +119,7 @@ class ODEWrapBlock(nn.Module):
 
     def init_solver(self,pars_to_pass_i,variables_from_optimizer,has_combined_input=False):
         if self.use_sdeint:
-            self.integrator = RK.Milstein(self.model.f, self.model.g, pars_to_pass_i, self.cparams)
+            self.integrator = RK.MultiEulerHeun(self.model.f, self.model.g, pars_to_pass_i, self.cparams)
             self.integrator.set_pars(pars_to_pass_i)
         elif self.use_odeint:
             self.integrator = ODEBlock(self.cparams)
